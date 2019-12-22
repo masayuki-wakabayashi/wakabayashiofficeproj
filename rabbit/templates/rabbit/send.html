@@ -1,0 +1,264 @@
+﻿{% load static %}
+<!doctype html>
+<html lang="ja">
+    <head>
+        <meta charset="utf-8">
+        <link href="https://fonts.googleapis.com/css?family=Noto+Serif+JP&display=swap&subset=japanese" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <style>
+            * {
+                margin: 0;
+                border-width: 0;
+                padding: 0;
+                color: black;
+                font-family: 'Noto Serif JP', serif;
+                line-height: 1.2;
+                box-sizing: border-box;
+            }
+            div {
+                padding: 1px;
+            }
+            table {
+                margin: 1px;
+                border-collapse: collapse;
+            }
+            td {
+                background-color: white;
+                border-style: solid;
+                border-width: 1px;
+                white-space: nowrap;
+            }
+            input {
+                padding: 1px;
+                width: 100%;
+                height: 100%;
+            }
+        </style>
+        <title>社会保険労務士法人 若林労務経営事務所</title>
+    </head>
+    <body>
+    <form action="{% url 'form' %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" class="office_id" name="office_id" value="{{ office_id }}">
+        <input type="hidden" class="encrypted" name="encrypted">
+    </form>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="{% static 'js/jsencrypt.min.js' %}"></script>
+    <script>
+        var golden_ratio = (1 + Math.sqrt(5)) / 2;
+        var inverse_of_gr = 1 / golden_ratio;
+        var base_color_r = 0;
+        var base_color_g = 26;
+        var base_color_b = 67;
+        var micro_adjustment = 0;
+        var public_key;
+    </script>
+    <script>
+        var user_agent = window.navigator.userAgent.toLowerCase();
+        if (user_agent.indexOf('edge') !== -1) {
+            micro_adjustment = 1;
+        }
+    </script>
+    <script>
+        $.get("{% static 'key/public.key' %}", function(data){
+            public_key = data;
+        });
+    </script>
+    <script>
+        function additional_validation (type, target) {
+            if (type === 'My Number') {
+                var a = target.split('');
+                a = a.map(Number);
+                var p = a.slice().reverse();
+                var q = [];
+                for (var n = 0; n < 12; n++) {
+                    if (n <= 6) {
+                        q.push(n + 1);
+                    } else {
+                        q.push(n - 5);
+                    }
+                }
+                var cd = 0;
+                for (n = 1; n < 12; n++) {
+                    cd = cd + p[n] * q[n];
+                }
+                cd = cd % 11
+                if (cd <= 1) {
+                    cd = 0;
+                } else {
+                    cd = 11 - cd
+                }
+                if (p[0] !== cd) {
+                    return false;
+                }
+            }
+            return true;
+        }
+    </script>
+    <script>
+        var items = [
+            {
+                item: '姓',
+                required: true
+            },
+            {
+                item: '名',
+                required: true
+            },
+            {
+                item: '個人番号',
+                split: 3,
+                text_align: 'center',
+                maxlength: 4,
+                inputmode: 'numeric',
+                required: true,
+                pattern: '^[0-9]{4}$',
+                validation: 'My Number'
+            }
+        ];
+        $('body').append('<div class="sheet"></div>');
+        for (var i = 0; i < items.length; i++) {
+            $('.sheet').append('<table class="Row' + String(i + 1) + '"></table>');
+            $('.Row' + String(i + 1)).append('<tr class="row' + String(i + 1) + '"></tr>');
+            var n = 1;
+            if (typeof items[i].split !== 'undefined') {
+                n = items[i].split;
+            }
+            $('.row' + String(i + 1)).append('<td class="col1">' + items[i].item + '</td>');
+            var text_align = 'left';
+            if (typeof items[i].text_align !== 'undefined') {
+                text_align = items[i].text_align;
+            }
+            var type = 'text';
+            if (typeof items[i].type !== 'undefined') {
+                type = items[i].type;
+            }
+            for (var j = 0; j < n; j++) {
+                $('.row' + String(i + 1)).append('<td class="col' + String(j + 2) + '"><input type="' + type + '" style="text-align: ' + text_align + ';"></td>');
+                if (items[i].required === true) {
+                    $('.row' + String(i + 1) + ' .col' + String(j + 2) + ' input').attr('required', 'required');
+                }
+                if (typeof items[i].maxlength !== 'undefined') {
+                    $('.row' + String(i + 1) + ' .col' + String(j + 2) + ' input').attr('maxlength', items[i].maxlength);
+                }
+                if (typeof items[i].inputmode !== 'undefined') {
+                    $('.row' + String(i + 1) + ' .col' + String(j + 2) + ' input').attr('inputmode', items[i].inputmode);
+                }
+                if (typeof items[i].pattern !== 'undefined') {
+                    $('.row' + String(i + 1) + ' .col' + String(j + 2) + ' input').attr('pattern', items[i].pattern);
+                }
+            }
+        }
+    </script>
+    <script>
+        $('body').append('<div class="lower_navigation_bar"></div>');
+        $('.lower_navigation_bar').append('<a><i class="material-icons">send</i></a>');
+    </script>
+    <script>
+        $('body').append('<div class="console"></div>');
+    </script>
+    <script>
+        $('a').has('i.material-icons:contains("send")').on('click', function(){
+            $('.console').html('');
+            var items_where_an_error_occurred = [];
+            for (var i = 0; i < items.length; i++) {
+                var n = 1;
+                if (typeof items[i].split !== 'undefined') {
+                    n = items[i].split;
+                }
+                var s = '';
+                for (var j = 0; j < n; j++) {
+                    s = s + String($('.row' + String(i + 1) + ' .col' + String(j + 2) + ' input').val());
+                    if ($('.row' + String(i + 1) + ' .col' + String(j + 2) + ' input').is(':invalid')) {
+                        items_where_an_error_occurred.push(i);
+                        break;
+                    }
+                }
+                if (items_where_an_error_occurred[items_where_an_error_occurred.length - 1] !== i) {
+                    if (additional_validation(items[i].validation, s) === false) {
+                        items_where_an_error_occurred.push(i);
+                    }
+                }
+            }
+            if (items_where_an_error_occurred.length === 0) {
+                var confirm_message = '送信します';
+                if (window.confirm(confirm_message)) {
+                    var data = {};
+                    for (var i = 0; i < items.length; i++) {
+                        var n = 1;
+                        if (typeof items[i].split !== 'undefined') {
+                            n = items[i].split;
+                        }
+                        var s = '';
+                        for (var j = 0; j < n; j++) {
+                            s = s + $('.row' + String(i + 1) + ' .col' + String(j + 2) + ' input').val();
+                        }
+                        data[items[i].item] = s;
+                    }
+                    var json = JSON.stringify(data);
+                    var encryptor = new JSEncrypt();
+                    encryptor.setPublicKey(public_key);
+                    var encrypted = encryptor.encrypt(json);
+                    $('.encrypted').val(encrypted);
+                    $('form').submit();
+                }
+            } else {
+                var error_message = '次の項目に誤りがあります:';
+                $('.console').append(error_message);
+                $('.console').append('<br>');
+                for (var i = 0; i < items_where_an_error_occurred.length; i++) {
+                    $('.console').append(String(items[items_where_an_error_occurred[i]].item));
+                    $('.console').append('<br>');
+                }
+            }
+        })
+    </script>
+    <script>
+        $('a').attr('href', 'javascript: void(0);');
+    </script>
+    <script>
+        $('.lower_navigation_bar').css('text-align', 'center');
+        $('i').css('vertical-align', 'bottom');
+    </script>
+    <script>
+        $('.col1').css('padding', '1px');
+    </script>
+    <script>
+        var x = 0;
+        for (var i = 0; i < items.length; i++) {
+            x = Math.max(x, Math.ceil($('.row' + String(i + 1) + ' .col1').width()));
+        }
+        for (var i = 0; i < items.length; i++) {
+            $('.row' + String(i + 1) + ' .col1').width(String(x) + 'px');
+        }
+        for (var i = 0; i < items.length; i++) {
+            var n = 1;
+            if (typeof items[i].split !== 'undefined') {
+                n = items[i].split;
+            }
+            for (var j = 0; j < n; j++) {
+                $('.row' + String(i + 1) + ' .col' + String(2 + j)).css('width', String((Math.ceil(golden_ratio * x) + micro_adjustment) / n) + 'px');
+            }
+        }
+    </script>
+    <script>
+        var derived_color_r = base_color_r;
+        var derived_color_g = base_color_g;
+        var derived_color_b = base_color_b;
+        $('i').css('color', 'rgb(' + Math.round(derived_color_r) + ', ' + Math.round(derived_color_g) + ', ' + Math.round(derived_color_b) + ')');
+        $('.console').css('color', 'rgb(' + Math.round(derived_color_r) + ', ' + Math.round(derived_color_g) + ', ' + Math.round(derived_color_b) + ')');
+        derived_color_r = (1 - inverse_of_gr) * base_color_r + inverse_of_gr * 255;
+        derived_color_g = (1 - inverse_of_gr) * base_color_g + inverse_of_gr * 255;
+        derived_color_b = (1 - inverse_of_gr) * base_color_b + inverse_of_gr * 255;
+        $('td').css('border-color', 'rgb(' + Math.round(derived_color_r) + ', ' + Math.round(derived_color_g) + ', ' + Math.round(derived_color_b) + ')');
+        derived_color_r = (1 - inverse_of_gr) * derived_color_r + inverse_of_gr * 255;
+        derived_color_g = (1 - inverse_of_gr) * derived_color_g + inverse_of_gr * 255;
+        derived_color_b = (1 - inverse_of_gr) * derived_color_b + inverse_of_gr * 255;
+        $('.lower_navigation_bar').css('background-color', 'rgb(' + Math.round(derived_color_r) + ', ' + Math.round(derived_color_g) + ', ' + Math.round(derived_color_b) + ')');
+        derived_color_r = (1 - inverse_of_gr) * derived_color_r + inverse_of_gr * 255;
+        derived_color_g = (1 - inverse_of_gr) * derived_color_g + inverse_of_gr * 255;
+        derived_color_b = (1 - inverse_of_gr) * derived_color_b + inverse_of_gr * 255;
+        $('body').css('background-color', 'rgb(' + Math.round(derived_color_r) + ', ' + Math.round(derived_color_g) + ', ' + Math.round(derived_color_b) + ')');
+    </script>
+    </body>
+</html>
