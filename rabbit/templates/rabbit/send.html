@@ -58,8 +58,10 @@
     </script>
     <script>
         var user_agent = window.navigator.userAgent.toLowerCase();
-        if (user_agent.indexOf('edge') !== -1) {
+        if (user_agent.indexOf('msie') != -1 || user_agent.indexOf('trident') != -1) {
             micro_adjustment = 1;
+        } else if (user_agent.indexOf('edge') !== -1) {
+            micro_adjustment = 4;
         }
     </script>
     <script>
@@ -97,6 +99,11 @@
             }
             return true;
         }
+    </script>
+    <script>
+        $('body').append('<div class="top_bar"></div>');
+        var title = '社会保険労務士法人 若林労務経営事務所'
+        $('.top_bar').append(title);
     </script>
     <script>
         var items = [
@@ -224,6 +231,7 @@
         $('i').css('vertical-align', 'bottom');
     </script>
     <script>
+        $('.top_bar').css('padding', '3px');
         $('.col1').css('padding', '1px');
     </script>
     <script>
@@ -249,6 +257,7 @@
         var derived_color_g = base_color_g;
         var derived_color_b = base_color_b;
         $('i').css('color', 'rgb(' + Math.round(derived_color_r) + ', ' + Math.round(derived_color_g) + ', ' + Math.round(derived_color_b) + ')');
+        $('.top_bar').css('background-color', 'rgb(' + Math.round(derived_color_r) + ', ' + Math.round(derived_color_g) + ', ' + Math.round(derived_color_b) + ')');
         $('.console').css('color', 'rgb(' + Math.round(derived_color_r) + ', ' + Math.round(derived_color_g) + ', ' + Math.round(derived_color_b) + ')');
         derived_color_r = (1 - inverse_of_gr) * base_color_r + inverse_of_gr * 255;
         derived_color_g = (1 - inverse_of_gr) * base_color_g + inverse_of_gr * 255;
@@ -262,6 +271,7 @@
         derived_color_g = (1 - inverse_of_gr) * derived_color_g + inverse_of_gr * 255;
         derived_color_b = (1 - inverse_of_gr) * derived_color_b + inverse_of_gr * 255;
         $('body').css('background-color', 'rgb(' + Math.round(derived_color_r) + ', ' + Math.round(derived_color_g) + ', ' + Math.round(derived_color_b) + ')');
+        $('.top_bar').css('color', 'rgb(' + Math.round(derived_color_r) + ', ' + Math.round(derived_color_g) + ', ' + Math.round(derived_color_b) + ')');
     </script>
     </body>
 </html>
