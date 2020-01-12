@@ -29,9 +29,15 @@
     <script>
         var user_agent = window.navigator.userAgent.toLowerCase();
         if (user_agent.indexOf('msie') != -1 || user_agent.indexOf('trident') != -1) {
-            micro_adjustment = 1;
+            micro_adjustment = 16;
         } else if (user_agent.indexOf('edge') !== -1) {
-            micro_adjustment = 4;
+            micro_adjustment = 22;
+        } else if (user_agent.indexOf('chrome') != -1) {
+            micro_adjustment = 22;
+        } else if (user_agent.indexOf('safari') != -1) {
+            micro_adjustment = 22;
+        } else if (user_agent.indexOf('firefox') != -1) {
+            micro_adjustment = 15;
         }
     </script>
     <script>
