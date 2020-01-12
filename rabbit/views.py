@@ -23,4 +23,6 @@ def list(request):
     posts = Post.objects.filter(posted_date__lte=timezone.now()-datetime.timedelta(days=28))
     posts.delete()
     posts = Post.objects.all().order_by('office_id')
+    for post in posts:
+        post.posted_date = post.posted_date.date()
     return render(request, 'rabbit/list.html', {'posts': posts})
