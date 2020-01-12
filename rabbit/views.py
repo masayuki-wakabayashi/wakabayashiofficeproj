@@ -1,9 +1,11 @@
+import datetime
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.utils import timezone
 from .models import Post
 
-def send(request, office_id):
-    return render(request, 'rabbit/send.html', {'office_id': office_id})
+def post(request, office_id):
+    return render(request, 'rabbit/post.html', {'office_id': office_id})
 
 def form(request):
     office_id = int(request.POST['office_id'])
@@ -15,4 +17,10 @@ def form(request):
         posted_date=posted_date
     )
     post.save()
-    return redirect(to='send/' + str(office_id))
+    return redirect(to='post/' + str(office_id))
+
+def list(request):
+    posts = Post.objects.filter(posted_date__lte=timezone.now()-datetime.timedelta(days=28))
+    posts.delete()
+    posts = Post.objects.all().order_by('office_id')
+    return render(request, 'rabbit/list.html', {'posts': posts})

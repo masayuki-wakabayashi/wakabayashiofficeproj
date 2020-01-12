@@ -6,45 +6,15 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link href="https://fonts.googleapis.com/css?family=Noto+Serif+JP&display=swap&subset=japanese" rel="stylesheet">
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-        <style>
-            * {
-                margin: 0;
-                border-width: 0;
-                padding: 0;
-                color: black;
-                font-family: 'Noto Serif JP', serif;
-                line-height: 1.2;
-                box-sizing: border-box;
-            }
-            div {
-                padding: 1px;
-            }
-            table {
-                margin: 1px;
-                border-collapse: collapse;
-            }
-            td {
-                padding: 1px;
-                background-color: white;
-                border-style: solid;
-                border-width: 1px;
-                white-space: nowrap;
-            }
-            input {
-                padding: 1px;
-                width: 100%;
-                height: 100%;
-                outline: none;
-            }
-        </style>
+        <link href="{% static 'css/style.css' %}" rel="stylesheet">
         <title>社会保険労務士法人 若林労務経営事務所</title>
     </head>
     <body>
-    <form action="{% url 'form' %}" method="post">
-        {% csrf_token %}
-        <input type="hidden" class="office_id" name="office_id" value="{{ office_id }}">
-        <input type="hidden" class="encrypted" name="encrypted">
-    </form>
+        <form action="{% url 'form' %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" class="office_id" name="office_id" value="{{ office_id }}">
+            <input type="hidden" class="encrypted" name="encrypted">
+        </form>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="{% static 'js/jsencrypt.min.js' %}"></script>
     <script>
@@ -165,11 +135,7 @@
         $('.lower_navigation_bar').append('<a><i class="material-icons">send</i></a>');
     </script>
     <script>
-        $('body').append('<div class="console"></div>');
-    </script>
-    <script>
         $('a').has('i.material-icons:contains("send")').on('click', function(){
-            $('.console').html('');
             var items_where_an_error_occurred = [];
             for (var i = 0; i < items.length; i++) {
                 var n = 1;
@@ -214,12 +180,11 @@
                 }
             } else {
                 var error_message = '次の項目に誤りがあります:';
-                $('.console').append(error_message);
-                $('.console').append('<br>');
                 for (var i = 0; i < items_where_an_error_occurred.length; i++) {
-                    $('.console').append(String(items[items_where_an_error_occurred[i]].item));
-                    $('.console').append('<br>');
+                    error_message += '\n'
+                    error_message += String(items[items_where_an_error_occurred[i]].item);
                 }
+                window.alert(error_message);
             }
         })
     </script>
@@ -258,7 +223,6 @@
         var derived_color_b = base_color_b;
         $('i').css('color', 'rgb(' + Math.round(derived_color_r) + ', ' + Math.round(derived_color_g) + ', ' + Math.round(derived_color_b) + ')');
         $('.top_bar').css('background-color', 'rgb(' + Math.round(derived_color_r) + ', ' + Math.round(derived_color_g) + ', ' + Math.round(derived_color_b) + ')');
-        $('.console').css('color', 'rgb(' + Math.round(derived_color_r) + ', ' + Math.round(derived_color_g) + ', ' + Math.round(derived_color_b) + ')');
         derived_color_r = (1 - inverse_of_gr) * base_color_r + inverse_of_gr * 255;
         derived_color_g = (1 - inverse_of_gr) * base_color_g + inverse_of_gr * 255;
         derived_color_b = (1 - inverse_of_gr) * base_color_b + inverse_of_gr * 255;
